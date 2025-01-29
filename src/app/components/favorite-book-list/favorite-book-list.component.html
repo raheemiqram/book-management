@@ -23,7 +23,10 @@
                     <tr>
                         <td>{{ fav_book.name }}</td>
                         <td>
-
+                            @if (fav_book.books.length === 0) {
+                                No favorite books available.
+                            }
+                            @else {   
                             @for (book of fav_book.books; track book.id) {
                             <span class="badge bg-success m-2">
                                 {{book.title}}
@@ -33,7 +36,7 @@
                                 </button>
                             </span>
 
-                            }
+                            }}
                         </td>
 
                         <td>
