@@ -1,49 +1,66 @@
 <div class="container mt-4">
     <h2>Favorite Book Lists</h2>
-  
+
     <!-- Input to create a new favorite book list -->
     <div class="mb-3">
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Enter favorite list name"
-        [(ngModel)]="newListName"
-      />
-      <button class="btn btn-success mt-2" (click)="createFavoriteBookList()">Create List</button>
+        <input type="text" class="form-control" placeholder="Enter favorite list name" [(ngModel)]="newListName" />
+        <button class="btn btn-success mt-2" (click)="createFavoriteBookList()">Create List</button>
     </div>
-  
-    <!-- Display favorite book lists -->
-    <div *ngFor="let favBook of favoriteBooks(); track favBook.id" class="card mb-3">
-      <div class="card-body">
-        <h5 class="card-title">{{ favBook.name }} ({{ favBook.books.length }} books)</h5>
-        
-        <!-- Add Book to Favorite List -->
-        <div class="d-flex align-items-center mb-2">
-          <select class="form-select me-2" [(ngModel)]="selectedBookId">
-            <option [value]="null">Select a book</option>
-            <option *ngFor="let book of books()" [value]="book.id">{{ book.title }}</option>
-          </select>
-          <button class="btn btn-primary" (click)="addBookToFavorite(favBook)">Add</button>
+
+    <div class="container">
+        <div class="table-container">
+            <h2>Book List</h2>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Books</th>
+                        <th>Add books</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (fav_book of favoriteBooks(); track fav_book.id) {
+                    <tr>
+                        <td>{{ fav_book.name }}</td>
+                        <td>
+
+                            @for (book of fav_book.books; track book.id) {
+                            <span class="badge bg-success m-2">
+                                {{book.title}}
+                                <button class="btn btn-danger btn-sm ms-2"
+                                    (click)="removeBookFromFavorite(fav_book, book.id)">
+                                    &times;
+                                </button>
+                            </span>
+
+                            }
+                        </td>
+
+                        <td>
+                            <span *ngFor="let book of books()">
+                                <input type="checkbox" [value]="book.id"
+                                    [(ngModel)]="fav_book.selectedBooks[book.id]" />
+                                {{ book.title }}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary" (click)="saveSelectedBooks(fav_book)">Save</button>
+                        </td>
+                    </tr>
+
+                    }
+
+
+                </tbody>
+            </table>
+
+            <!-- Pagination Controls -->
+            <div class="d-flex justify-content-between mt-3">
+                <button class="btn btn-secondary" [disabled]="!previousFavBooksUrl()"
+                    (click)="fetchPreviousFavoriteBooks()">Previous</button>
+                <button class="btn btn-secondary" [disabled]="!nextFavBooksUrl()"
+                    (click)="fetchNextFavoriteBooks()">Next</button>
+            </div>
         </div>
-  
-        <!-- Display Books in Favorite List -->
-        <ul class="list-group">
-          @for (bookId of favBook.books; track bookId) {
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              Book ID: {{ bookId }}
-              <button class="btn btn-danger btn-sm" (click)="removeBookFromFavorite(favBook, bookId)">Remove</button>
-            </li>
-          }
-        </ul>
-  
-        <button class="btn btn-outline-danger mt-2" (click)="removeFavoriteBook(favBook.id!)">Delete List</button>
-      </div>
     </div>
-  
-    <!-- Pagination Controls -->
-    <div class="d-flex justify-content-between mt-3">
-      <button class="btn btn-secondary" [disabled]="!previousFavBooksUrl()" (click)="fetchPreviousFavoriteBooks()">Previous</button>
-      <button class="btn btn-secondary" [disabled]="!nextFavBooksUrl()" (click)="fetchNextFavoriteBooks()">Next</button>
-    </div>
-  </div>
-  
+</div>

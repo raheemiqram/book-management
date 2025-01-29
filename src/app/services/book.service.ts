@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { Book, FavoriteBook } from '../models/book';
+import { Book, FavoriteBook, FavoriteBookList } from '../models/book';
 import { Signal } from '@angular/core';
 
 @Injectable({
@@ -9,13 +9,14 @@ import { Signal } from '@angular/core';
 })
 export class BookService {
   private apiUrl = `${environment.apiBaseUrl}/books/`;
-  private favoriteBooksUrl = `${environment.apiBaseUrl}/book-list/`;
+  private favoriteBooksUrl = `${environment.apiBaseUrl}/book-lists/`;
 
   books = signal<Book[]>([]);
   nextBooksUrl = signal<string | null>(null);
   previousBooksUrl = signal<string | null>(null);
 
   favoriteBooks = signal<FavoriteBook[]>([]);
+  favoriteBooksList = signal<FavoriteBookList[]>([]);
   nextFavBooksUrl = signal<string | null>(null);
   previousFavBooksUrl = signal<string | null>(null);
 
@@ -35,13 +36,27 @@ export class BookService {
   /** Fetch paginated favorite books */
   fetchFavoriteBooks(url: string = this.favoriteBooksUrl): void {
     this.http
-      .get<{ count: number; next: string | null; previous: string | null; results: FavoriteBook[] }>(url)
+      .get<{ count: number; next: string | null; previous: string | null; results: any[] }>(url)
       .subscribe((response) => {
-        this.favoriteBooks.set(response.results);
+        const transformedFavoriteBooks = response.results.map((favBook) => {
+          const books = favBook.books.map((book: any) => {
+            return {
+              id: book.id,
+              title: book.title,
+              year: book.year,
+              auther: book.auther
+            };
+          });
+  
+          return new FavoriteBookList(favBook.id, favBook.name, books, {});
+        });
+  
+        this.favoriteBooksList.set(transformedFavoriteBooks);
         this.nextFavBooksUrl.set(response.next);
         this.previousFavBooksUrl.set(response.previous);
       });
   }
+  
 
   /** Add a new favorite book list */
   addFavoriteBook(favoriteBook: FavoriteBook): void {

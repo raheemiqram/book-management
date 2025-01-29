@@ -1,8 +1,8 @@
-import { Component, OnInit, Signal, inject } from '@angular/core';
+import { Component, ElementRef, OnInit, Signal, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { BookService } from '../../services/book.service';
-import { FavoriteBook, Book } from '../../models/book';
+import { FavoriteBook, Book, FavoriteBookList } from '../../models/book';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -14,12 +14,13 @@ import { FormsModule } from '@angular/forms';
 })
 export class FavoriteBookListComponent implements OnInit {
   bookService = inject(BookService);
-  favoriteBooks: Signal<FavoriteBook[]> = this.bookService.favoriteBooks;
+  favoriteBooks: Signal<FavoriteBookList[]> = this.bookService.favoriteBooksList;
   books: Signal<Book[]> = this.bookService.books;
   nextFavBooksUrl: Signal<string | null> = this.bookService.nextFavBooksUrl;
   previousFavBooksUrl: Signal<string | null> = this.bookService.previousFavBooksUrl;
   newListName: string = '';
-  selectedBookId: number | null = null;
+
+  @ViewChild('bookSelectModal') bookSelectModal!: ElementRef;
 
   ngOnInit(): void {
     this.bookService.fetchFavoriteBooks();
@@ -49,17 +50,44 @@ export class FavoriteBookListComponent implements OnInit {
     this.bookService.removeFavoriteBook(id);
   }
 
-  addBookToFavorite(favBook: FavoriteBook): void {
-    if (!this.selectedBookId) return;
+  removeBookFromFavorite(favBookList: FavoriteBookList, bookId: number): void {
 
-    if (!favBook.books.includes(this.selectedBookId)) {
-      favBook.books.push(this.selectedBookId);
-      this.bookService.updateFavoriteBook(favBook);
+    const bookIds = favBookList.books.map((book: Book) => book.id);
+    const bookIndex = bookIds.indexOf(bookId);
+
+    if (bookIndex > -1) {
+      bookIds.splice(bookIndex, 1);
+
+      const updatedFavBook: FavoriteBook = {
+        id: favBookList.id,
+        name: favBookList.name,
+        books: bookIds,
+      };
+      this.bookService.updateFavoriteBook(updatedFavBook)
+      this.fetchPreviousFavoriteBooks()
     }
   }
 
-  removeBookFromFavorite(favBook: FavoriteBook, bookId: number): void {
-    favBook.books = favBook.books.filter((id) => id !== bookId);
-    this.bookService.updateFavoriteBook(favBook);
+  saveSelectedBooks(favBook: FavoriteBookList): void {
+
+    if (!favBook.selectedBooks) {
+      return; // Prevents errors if selectedBooks is undefined
+    }
+
+    const selectedBookIds = Object.keys(favBook.selectedBooks)
+      .filter((key) => favBook.selectedBooks[+key])
+      .map(Number);
+
+    const existingBookIds = favBook.books.map((book: Book) => book.id);
+    const updatedBookIds = Array.from(new Set([...existingBookIds, ...selectedBookIds]));
+
+
+    const updatedFavBook: FavoriteBook = {
+      id: favBook.id,
+      name: favBook.name,
+      books: updatedBookIds,
+    };
+    this.bookService.updateFavoriteBook(updatedFavBook)
+    this.fetchPreviousFavoriteBooks()
   }
 }

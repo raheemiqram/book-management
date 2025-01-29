@@ -2,10 +2,10 @@ export interface Book {
     id: number;
     title: string;
     year: number;
-    auther: string;
+    author: string;
   }
   
-export class FavoriteBook {
+  export class FavoriteBook{
     id?: number;
     name: string;
     books: number[];
@@ -16,3 +16,18 @@ export class FavoriteBook {
     }
   }
   
+
+
+  export class FavoriteBookList {
+    id?: number;
+    name: string;
+    books: Book[]; 
+    selectedBooks: { [key: number]: boolean } = {};
+  
+    constructor(id: number, name: string, books: Book[], selectedBooks: {}) {
+      this.id = id  
+      this.name = name;
+      this.books = books;
+      this.selectedBooks = selectedBooks;
+    }
+  }

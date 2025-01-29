@@ -2,12 +2,12 @@ import { Component, OnInit, Signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BookService } from '../../services/book.service';
 import { Book } from '../../models/book';
-import { HttpClientModule } from '@angular/common/http';
+
 
 @Component({
   selector: 'app-book-list',
   standalone: true,
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule],
   templateUrl: './book-list.component.html',
   styleUrls: ['./book-list.component.scss'],
 })
