@@ -19,9 +19,7 @@ export class FavoriteBookListComponent implements OnInit {
   nextFavBooksUrl: Signal<string | null> = this.bookService.nextFavBooksUrl;
   previousFavBooksUrl: Signal<string | null> = this.bookService.previousFavBooksUrl;
   newListName: string = '';
-
-  @ViewChild('bookSelectModal') bookSelectModal!: ElementRef;
-
+  
   ngOnInit(): void {
     this.bookService.fetchFavoriteBooks();
     this.bookService.fetchBooks();
@@ -44,10 +42,6 @@ export class FavoriteBookListComponent implements OnInit {
     const newFavList = new FavoriteBook(this.newListName, []);
     this.bookService.addFavoriteBook(newFavList);
     this.newListName = '';
-  }
-
-  removeFavoriteBook(id: number): void {
-    this.bookService.removeFavoriteBook(id);
   }
 
   removeBookFromFavorite(favBookList: FavoriteBookList, bookId: number): void {

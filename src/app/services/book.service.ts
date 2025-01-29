@@ -20,9 +20,8 @@ export class BookService {
   nextFavBooksUrl = signal<string | null>(null);
   previousFavBooksUrl = signal<string | null>(null);
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  /** Fetch books with pagination */
   fetchBooks(url: string = this.apiUrl): void {
     this.http
       .get<{ count: number; next: string | null; previous: string | null; results: Book[] }>(url)
@@ -33,7 +32,6 @@ export class BookService {
       });
   }
 
-  /** Fetch paginated favorite books */
   fetchFavoriteBooks(url: string = this.favoriteBooksUrl): void {
     this.http
       .get<{ count: number; next: string | null; previous: string | null; results: any[] }>(url)
@@ -47,25 +45,23 @@ export class BookService {
               auther: book.auther
             };
           });
-  
+
           return new FavoriteBookList(favBook.id, favBook.name, books, {});
         });
-  
+
         this.favoriteBooksList.set(transformedFavoriteBooks);
         this.nextFavBooksUrl.set(response.next);
         this.previousFavBooksUrl.set(response.previous);
       });
   }
-  
 
-  /** Add a new favorite book list */
+
   addFavoriteBook(favoriteBook: FavoriteBook): void {
     this.http.post<FavoriteBook>(this.favoriteBooksUrl, favoriteBook).subscribe(() => {
       this.fetchFavoriteBooks();
     });
   }
 
-  /** Update a favorite book list */
   updateFavoriteBook(favoriteBook: FavoriteBook): void {
     this.http
       .put<FavoriteBook>(`${this.favoriteBooksUrl}${favoriteBook.id}/`, favoriteBook)
@@ -74,7 +70,6 @@ export class BookService {
       });
   }
 
-  /** Remove a favorite book list */
   removeFavoriteBook(id: number): void {
     this.http.delete(`${this.favoriteBooksUrl}${id}/`).subscribe(() => {
       this.favoriteBooks.set(this.favoriteBooks().filter((fav) => fav.id !== id));

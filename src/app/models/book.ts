@@ -3,31 +3,31 @@ export interface Book {
     title: string;
     year: number;
     author: string;
-  }
-  
-  export class FavoriteBook{
+}
+
+export class FavoriteBook {
     id?: number;
     name: string;
     books: number[];
-  
+
     constructor(name: string, books: number[]) {
-      this.name = name;
-      this.books = books;
+        this.name = name;
+        this.books = books;
     }
-  }
-  
+}
 
 
-  export class FavoriteBookList {
+
+export class FavoriteBookList {
     id?: number;
     name: string;
-    books: Book[]; 
+    books: Book[];
     selectedBooks: { [key: number]: boolean } = {};
-  
+
     constructor(id: number, name: string, books: Book[], selectedBooks: {}) {
-      this.id = id  
-      this.name = name;
-      this.books = books;
-      this.selectedBooks = selectedBooks;
+        this.id = id
+        this.name = name;
+        this.books = books;
+        this.selectedBooks = selectedBooks;
     }
-  }
+}
